@@ -1,0 +1,29 @@
+name: Daily Auto Commit for Streak
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Setiap hari jam 00:00 UTC (07:00 WIB)
+  workflow_dispatch:
+
+jobs:
+  commit-streak:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Git config
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Update dummy file
+        run: |
+          echo "Last updated on $(date)" > .last-commit.txt
+
+      - name: Commit and push
+        run: |
+          git add .last-commit.txt
+          git commit -m "Daily commit: $(date)"
+          git push
