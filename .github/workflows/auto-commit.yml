@@ -2,8 +2,8 @@ name: Daily Auto Commit
 
 on:
   schedule:
-    - cron: '0 0 * * *' # Tiap hari jam 00:00 UTC / 07:00 WIB
-  workflow_dispatch:      # Bisa dijalankan manual juga
+    - cron: '0 0 * * *'  # Setiap hari jam 00:00 UTC
+  workflow_dispatch:
 
 jobs:
   commit:
@@ -18,9 +18,14 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Tambahkan file dummy dan commit
+      - name: Add dummy file and commit
         run: |
           echo "Last update: $(date)" > .last-commit.txt
-          git add .last-commit.txt || true
-          git commit -m "Auto commit: $(date)" || echo "Tidak ada yang perlu di-commit"
-          git push || echo "Push gagal atau tidak diperlukan"
+          git add .last-commit.txt
+          git commit -m "Auto commit: $(date)" || echo "No changes to commit"
+
+      - name: Push changes
+        run: |
+          git push https://github.com/${{ github.repository }} HEAD:refs/heads/main
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
