@@ -3,7 +3,7 @@ name: Daily Auto Commit for Streak
 on:
   schedule:
     - cron: '0 0 * * *'  # Setiap hari jam 00:00 UTC (07:00 WIB)
-  workflow_dispatch:      # Bisa dijalankan manual juga
+  workflow_dispatch:
 
 jobs:
   commit-streak:
@@ -12,8 +12,23 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Git config
         run: |
           git config user.name "github-actions[bot]"
-          git config user.email "41898282
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Update dummy file
+        run: |
+          echo "Last updated: $(date)" > .last-commit.txt
+
+      - name: Commit and push if there are changes
+        run: |
+          git add .last-commit.txt
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "Daily commit: $(date)"
+            git push
