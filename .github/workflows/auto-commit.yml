@@ -2,7 +2,7 @@ name: Daily Auto Commit for Streak
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # Setiap hari jam 00:00 UTC (07:00 WIB)
+    - cron: '0 0 * * *'  # Setiap hari jam 00:00 UTC
   workflow_dispatch:
 
 jobs:
@@ -22,8 +22,12 @@ jobs:
         run: |
           echo "Last updated on $(date)" > .last-commit.txt
 
-      - name: Commit and push
+      - name: Commit and push changes if there are any
         run: |
           git add .last-commit.txt
-          git commit -m "Daily commit: $(date)"
-          git push
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Daily commit: $(date)"
+            git push
+          fi
