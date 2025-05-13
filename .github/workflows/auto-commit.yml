@@ -2,7 +2,7 @@ name: Daily Auto Commit for Streak
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # Setiap hari jam 00:00 UTC (07:00 WIB)
+    - cron: '0 0 * * *'
   workflow_dispatch:
 
 jobs:
@@ -17,18 +17,30 @@ jobs:
 
       - name: Setup Git config
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
       - name: Update dummy file
         run: |
+          echo "👉 Menulis timestamp ke .last-commit.txt"
           echo "Last updated: $(date)" > .last-commit.txt
+          cat .last-commit.txt
 
-      - name: Commit and push if there are changes
+      - name: Add & check changes
         run: |
+          echo "👉 Menambahkan file"
           git add .last-commit.txt
+
+          echo "👉 Mengecek apakah ada perubahan..."
           if git diff --cached --quiet; then
-            echo "No changes to commit."
+            echo "✅ Tidak ada perubahan. Tidak ada commit."
+            exit 0
           else
-            git commit -m "Daily commit: $(date)"
-            git push
+            echo "✅ Ada perubahan. Lanjut commit."
+          fi
+
+      - name: Commit & push
+        run: |
+          echo "👉 Commit & Push"
+          git commit -m "Daily commit: $(date)" || echo "⚠️ Commit failed"
+          git push || echo "❌ Push failed"
