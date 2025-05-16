@@ -8,13 +8,17 @@ on:
 jobs:
   auto-commit:
     runs-on: ubuntu-latest
+    # Tambahkan permission yang diperlukan
+    permissions:
+      contents: write
     
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}  # Token default atau gunakan personal access token
+          # Gunakan PAT daripada GITHUB_TOKEN standar untuk mengatasi masalah izin
+          token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
       
       - name: Setup Git user
         run: |
