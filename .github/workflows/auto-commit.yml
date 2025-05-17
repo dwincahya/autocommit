@@ -22,6 +22,11 @@ jobs:
           git config --global user.name "GitHub Actions Bot"
           git config --global user.email "actions@github.com"
       
+      - name: Pull latest changes
+        run: |
+          # Pull dengan strategi rebase untuk menghindari konflik
+          git pull --rebase origin main || git pull --rebase origin master || echo "Tidak bisa pull, melanjutkan..."
+      
       - name: Create/update streak file
         run: |
           # Buat atau update file untuk streak
@@ -34,7 +39,8 @@ jobs:
           if [ -n "$(git status --porcelain)" ]; then
             git add streak.md
             git commit -m "Daily commit untuk menjaga streak 🔥 $(date)"
-            git push
+            # Push dengan force jika diperlukan, tapi gunakan --force-with-lease untuk keamanan
+            git push --force-with-lease || git push
             echo "✅ Berhasil commit dan push!"
           else
             echo "❌ Tidak ada perubahan untuk di-commit"
